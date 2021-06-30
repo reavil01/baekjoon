@@ -114,4 +114,36 @@ class Level7 {
             .sum()
         println(code)
     }
+
+    fun `백준 2941`() {
+        val words = listOf(
+            "c=", "c-", "dz=", "d-", "lj", "nj", "s=", "z="
+        )
+
+        var text = readLine()!!
+        for (word in words) {
+            text = text.replace(word, ".")
+        }
+        println(text.length)
+    }
+
+    fun `백준 1316`() {
+        val n = readLine()!!.toInt()
+
+        var cnt = 0
+        for (i in 1..n) {
+            val word = readLine()!!
+            val distinct = word.fold(word.first().toString()) { acc, c ->
+                when (acc.last()) {
+                    c -> acc
+                    else -> acc + c
+                }
+            }
+            when (distinct.length) {
+                distinct.toList().distinct().size -> cnt++
+                else -> cnt
+            }
+        }
+        println(cnt)
+    }
 }
