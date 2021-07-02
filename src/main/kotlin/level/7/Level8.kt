@@ -107,4 +107,23 @@ class Level8 {
             .sumOf { it }
         println(sum)
     }
+
+    fun `백준 1011`() {
+        val n = readLine()!!.toInt()
+        for (i in 1..n) {
+            val (a, b) = readLine()!!.split(" ").map { it.toLong() }
+            val diff = b - a
+            for (numOfWrap in 1L..1024 * 1024 * 1024L) {
+                val i = numOfWrap / 2L
+                val maxRange = when (numOfWrap % 2) {
+                    0L -> (i * i + i)
+                    else -> (i * i + i) + i + 1L
+                }
+                if (maxRange >= diff) {
+                    println(numOfWrap)
+                    break
+                }
+            }
+        }
+    }
 }
