@@ -2,16 +2,15 @@ package level.`7`
 
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
+import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.absoluteValue
 import kotlin.math.sqrt
+import kotlin.system.exitProcess
 
 
 fun main() {
 
 }
-
-
 
 class Level9 {
     fun `백준 1978`() {
@@ -155,4 +154,50 @@ class Level9 {
         list.filter { it.value % 2 != 0 }
             .map { it.key }
             .first()
+
+    fun `백준 4153`() {
+        while (true) {
+            val inputs = readLine()!!.split(" ").map { it.toInt() }
+            if (inputs.all { it == 0 }) exitProcess(0)
+
+            val max = inputs.maxOf { it }
+            val others = inputs.filter { it < max }.sumOf { it * it }
+            if (max * max == others) println("right") else println("wrong")
+        }
+    }
+
+    fun `백준 3053`() {
+        val r = readLine()!!.toDouble()
+        val euclid = PI * r * r
+        val taxi = 2 * r * r
+        println("%4f".format(euclid))
+        println("%4f".format(taxi))
+    }
+
+    fun `백준 1002`() {
+        val n = readLine()!!.toInt()
+        for (i in 1..n) {
+            val inputs = readLine()!!.split(" ").map { it.toDouble() }
+            val p1 = inputs[0] to inputs[1]
+            val r1 = inputs[2]
+            val p2 = inputs[3] to inputs[4]
+            val r2 = inputs[5]
+            val dist = calcDistance(p1, p2)
+            val minRadius = abs(r1 - r2)
+            val maxRadius = abs(r1 + r2)
+            val result = when {
+                p1 == p2 && r1 == r2 -> -1
+                minRadius < dist && dist < maxRadius -> 2
+                minRadius > dist || dist > maxRadius || dist == 0.0 -> 0
+                else -> 1
+            }
+            println(result)
+        }
+    }
+
+    private fun calcDistance(p1: Pair<Double, Double>, p2: Pair<Double, Double>): Double {
+        val (x1, y1) = p1
+        val (x2, y2) = p2
+        return sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
+    }
 }
