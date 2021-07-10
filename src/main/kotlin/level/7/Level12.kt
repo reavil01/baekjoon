@@ -22,14 +22,14 @@ fun main() {
 
     val ans = data.toMutableList()
     ans.sort()
-    println(data)
+//    println(data)
 
 //    println("total data size: ${data.size}")
 //    println("total data last idx: ${data.lastIndex}")
     val min = min(n, 2 * 2 * 2 * 2)
     timSort(data, min)
 
-    if(ans == data) {
+    if (ans == data) {
         println("정답!")
     } else {
         println("오답!")
@@ -110,7 +110,7 @@ private fun insertStack(data: MutableList<Int>, stack: MutableList<Pair<Int, Int
                     insertStack(data, stack, midRun.first to rightRun.second)
                 }
 
-            }else {
+            } else {
                 stack.add(leftRun)
                 stack.add(midRun)
                 stack.add(rightRun)
@@ -127,13 +127,13 @@ private fun merge(data: MutableList<Int>, leftRun: Pair<Int, Int>, rightRun: Pai
     val rightSize = rightRun.size()
 
     println("[Merge 2 runs] left run: $leftRun, right run: $rightRun")
-    println("[Merge 2 runs] before: $data")
+    println("[Merge 2 runs] before: ${data.subList(leftRun.first, rightRun.second + 1)}")
     if (leftSize < rightSize)
         mergeHi(data, leftRun, rightRun)
     else
         mergeLo(data, leftRun, rightRun)
 
-    println("[Merge 2 runs] after: $data")
+    println("[Merge 2 runs] after: ${data.subList(leftRun.first, rightRun.second + 1)}")
 }
 
 
@@ -172,6 +172,73 @@ private fun mergeLo(data: MutableList<Int>, leftRun: Pair<Int, Int>, rightRun: P
     println("After sort: ${data.subList(leftRun.first, rightRun.second + 1)}")
 }
 
+private fun gallopLeft(data: MutableList<Int>, start: Int, cur: Int, target: Int): Int {
+    println("[GALLOP LEFT] input: start idx: $start, current idx: $cur, target val: $target")
+    println("[GALLOP LEFT] copy data: $data")
+
+    var pivot = cur
+    var i = 1
+    var add = 2
+    while (data[pivot] > target) {
+        repeat(i) { add *= 2 }
+        pivot -= add
+//        println("new pivot $pivot")
+        i++
+        if (pivot < start) {
+            pivot = start
+            break
+        }
+    }
+
+    val asc = Comparator<Int> { a, b ->
+        when {
+            a < b -> 1
+            a > b -> -1
+            else -> 0
+        }
+    }
+
+    val idx = findIndexViaBinarySearch(data.subList(pivot, pivot + add), target, asc)
+    pivot += (idx + 1)
+
+    println("[GALLOP LEFT] output: start idx: $start, new idx: $pivot, new val: ${data[pivot]}")
+    return pivot
+}
+
+private fun gallopRight(data: MutableList<Int>, start: Int, cur: Int, target: Int): Int {
+    println("[GALLOP RIGHT] input: start idx: $start, current idx: $cur, target val: $target")
+    println("[GALLOP RIGHT] copy data: $data")
+
+    var pivot = cur
+    var i = 1
+    var add = 2
+    while (data[pivot] > target) {
+        repeat(i) { add *= 2 }
+        pivot += add
+//        println("new pivot $pivot")
+        i++
+        if (pivot < start) {
+            pivot = start
+            break
+        }
+    }
+
+    val asc = Comparator<Int> { a, b ->
+        when {
+            a < b -> 1
+            a > b -> -1
+            else -> 0
+        }
+    }
+
+    val idx = findIndexViaBinarySearch(data.subList(pivot, pivot + add), target, asc)
+    pivot += (idx + 1)
+
+    println("[GALLOP LEFT] output: start idx: $start, new idx: $pivot, new val: ${data[pivot]}")
+    return pivot
+    return 0
+}
+
 private fun mergeHi(data: MutableList<Int>, leftRun: Pair<Int, Int>, rightRun: Pair<Int, Int>) {
     println("[Merge Hi] Run left: $leftRun, right: $rightRun")
     val copy = data.subList(rightRun.first, rightRun.second + 1).toMutableList()
@@ -180,25 +247,60 @@ private fun mergeHi(data: MutableList<Int>, leftRun: Pair<Int, Int>, rightRun: P
     var leftIndex = leftRun.second
     var rightIndex = copy.lastIndex
 
+    var minGallop = 7
+    var gallopLeftCnt = 0
+    var gallopRightCnt = 0
     println("Before sort: ${data.subList(leftRun.first, rightRun.second + 1)}")
     while (leftIndex >= leftRun.first && rightIndex >= 0) {
         if (data[leftIndex] < copy[rightIndex]) {
-            data[idx] = copy[rightIndex]
-            rightIndex--
+            val step = when {
+                gallopLeftCnt >= minGallop -> {
+                    gallopLeftCnt = 0
+                    gallopLeft(copy, 0, rightIndex, data[leftIndex])
+                }
+                else -> {
+                    gallopLeftCnt++
+                    rightIndex
+                }
+            }
+
+            for (i in rightIndex downTo step) {
+                data[idx] = copy[i]
+                idx--
+            }
+
+            rightIndex = step - 1
+            gallopRightCnt = 0
         } else {
+            val step = when {
+                gallopRightCnt >= minGallop -> {
+                    gallopRightCnt = 0
+                    gallopRight(data, leftRun.first, leftIndex, copy[rightIndex])
+                }
+                else -> {
+                    gallopLeftCnt++
+                    leftIndex
+                }
+            }
+            println("?? rightIndex: $rightIndex, left idx: $leftIndex, idx: $idx")
             data[idx] = data[leftIndex]
             leftIndex--
+            gallopRightCnt++
+            gallopLeftCnt = 0
+            idx--
         }
-        idx--
+
     }
 
     while (leftIndex >= leftRun.first) {
+        println("remain left: rightIndex: $rightIndex, left idx: $leftIndex, idx: $idx")
         data[idx] = data[leftIndex]
         idx--
         leftIndex--
     }
 
     while (rightIndex >= 0) {
+        println("remain right: rightIndex: $rightIndex, left idx: $leftIndex, idx: $idx")
         data[idx] = copy[rightIndex]
         idx--
         rightIndex--
@@ -251,7 +353,7 @@ private fun makeRun(data: MutableList<Int>, start: Int, end: Int, min: Int): Pai
 //    println("b reverse $data")
     if (data[start] > data[lastIdx]) { // DESC to ASC
 //        if (lastIdx < data.lastIndex) {
-            data.subList(start, lastIdx + 1).reverse()
+        data.subList(start, lastIdx + 1).reverse()
 //        } else {
 //            data.subList(start, data.lastIndex + 1).reverse()
 //        }
