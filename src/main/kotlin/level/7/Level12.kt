@@ -5,23 +5,10 @@ import java.io.BufferedWriter
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.lang.Integer.min
-import java.util.*
 import kotlin.random.Random.Default.nextInt
 
 fun main() {
-//    val reader = BufferedReader(InputStreamReader(System.`in`))
-//    val writer = BufferedWriter(OutputStreamWriter(System.out))
-//    val n = reader.readLine().toInt()
-//    val data = mutableListOf<Int>()
-//    repeat(n) { data.add(reader.readLine().toInt()) }
-//
-//    val min = min(n, 2 * 2 * 2 * 2)
-//    val timsort = TimSort()
-//    timsort.sort(data, min)
-//
-//    data.forEach { writer.write("$it\n") }
-//    writer.flush()
-    timosrtTest()
+
 }
 
 fun timosrtTest() {
@@ -100,5 +87,57 @@ class Level12 {
             } else end = idx
         }
         return end
+    }
+
+    fun `백준 10989`() {
+        val reader = BufferedReader(InputStreamReader(System.`in`))
+        val writer = BufferedWriter(OutputStreamWriter(System.out))
+        val sorted = IntArray(9999) { 0 }
+        val n = reader.readLine().toInt()
+
+        repeat(n) {
+            val v = reader.readLine().toInt()
+            sorted[v - 1] += 1
+        }
+
+
+        sorted.forEachIndexed { idx, v ->
+            for (i in 1..v) {
+                writer.write("${idx + 1}\n")
+            }
+        }
+        writer.flush()
+    }
+
+    fun `백준 2108`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val n = reader.readLine().toInt()
+        val data = mutableListOf<Int>()
+
+        repeat(n) {
+            data.add(
+                reader.readLine().toInt()
+            )
+        }
+
+
+        val mean = data.average()
+        val maxCnt = data.groupingBy { it }.eachCount().maxOf { it.value }
+        val modes = data.groupingBy { it }.eachCount().filter { it.value == maxCnt }.keys
+        val mode = when (modes.size) {
+            1 -> modes.first()
+            else -> modes.sorted()[1]
+        }
+
+        data.sort()
+        val media = data[n / 2]
+        val diff = data.last() - data.first()
+
+        writer.write("%.0f".format(mean) + "\n")
+        writer.write("$media\n")
+        writer.write("$mode\n")
+        writer.write("$diff\n")
+        writer.flush()
     }
 }
