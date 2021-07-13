@@ -4,32 +4,11 @@ import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
-import java.lang.Integer.min
-import kotlin.random.Random.Default.nextInt
+
 
 fun main() {
 
 }
-
-fun timosrtTest() {
-    val data = mutableListOf<Int>()
-    val n = 10000
-    repeat(n) { data.add(nextInt(0, 1000000)) }
-
-    val ans = data.toMutableList()
-    ans.sort()
-
-    val min = min(n, 2 * 2 * 2 * 2)
-    val timsort = TimSort()
-    timsort.sort(data, min)
-
-    if (ans == data) {
-        println("정답!")
-    } else {
-        println("오답!")
-    }
-}
-
 
 class Level12 {
     fun `백준 2750`() {
@@ -139,5 +118,121 @@ class Level12 {
         writer.write("$mode\n")
         writer.write("$diff\n")
         writer.flush()
+    }
+
+    fun `백준 1427`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val ans = reader.readLine().asIterable().sortedDescending().toCharArray()
+
+        writer.write(ans)
+        writer.flush()
+    }
+
+    fun `백준 11650`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+
+        val data = mutableListOf<Pair<Int, Int>>()
+        val n = reader.readLine().toInt()
+        repeat(n) {
+            val (x, y) = reader.readLine().split(" ").map { it.toInt() }
+            data.add(x to y)
+        }
+
+        val sorted = data.sortedWith(Comparator { o1, o2 ->
+            when {
+                o1.first > o2.first -> 1
+                o1.first == o2.first && o1.second > o2.second -> 1
+                else -> -1
+            }
+        })
+
+        sorted.forEach { writer.write("${it.first} ${it.second}\n") }
+        writer.flush()
+    }
+
+    fun `백준 11651`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+
+        val data = mutableListOf<Pair<Int, Int>>()
+        val n = reader.readLine().toInt()
+        repeat(n) {
+            val (x, y) = reader.readLine().split(" ").map { it.toInt() }
+            data.add(x to y)
+        }
+
+        val sorted = data.sortedWith(Comparator { o1, o2 ->
+            when {
+                o1.second > o2.second -> 1
+                o1.second == o2.second && o1.first > o2.first -> 1
+                else -> -1
+            }
+        })
+
+        sorted.forEach { writer.write("${it.first} ${it.second}\n") }
+        writer.flush()
+    }
+
+    fun `백준 1181`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+
+        val data = mutableListOf<String>()
+        val n = reader.readLine().toInt()
+        repeat(n) {
+            data.add(reader.readLine())
+        }
+
+        val sorted = data.distinct().sortedWith { o1, o2 ->
+            when {
+                o1.length < o2.length -> -1
+                o1.length == o2.length && o1 < o2 -> -1
+                else -> 1
+            }
+        }
+        sorted.forEach { writer.write("$it\n") }
+        writer.flush()
+        writer.close()
+        reader.close()
+    }
+
+    fun `백준 10814`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+
+        val data = mutableListOf<Pair<Int, String>>()
+        val n = reader.readLine().toInt()
+        repeat(n) {
+            val (a, b) = reader.readLine().split(" ")
+            data.add(a.toInt() to b)
+        }
+
+        val sorted = data.sortedBy { it.first }
+
+        sorted.forEach { writer.write("${it.first} ${it.second}\n") }
+        writer.flush()
+        writer.close()
+        reader.close()
+    }
+
+    fun `백준 18870`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+
+        val n = reader.readLine().toInt()
+        val data = reader.readLine().split(" ").map { it.toInt() }
+
+        val sorted = data.distinct().sorted()
+
+        data.forEach {
+            val ans = sorted.binarySearch(it)
+            writer.write("$ans ")
+        }
+
+        writer.flush()
+        writer.close()
+        reader.close()
     }
 }
