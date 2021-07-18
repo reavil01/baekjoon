@@ -3,7 +3,6 @@ package level.`7`
 import kotlin.system.exitProcess
 
 
-
 fun main() {
 
 }
@@ -240,4 +239,54 @@ class Level14 {
 
     private fun filterTargetIdices(problem: MutableList<Int>) =
         problem.mapIndexed { idx, v -> if (v == 0) idx else null }.filterNotNull()
+
+    fun `백준 14888`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val N = reader.readLine().toInt()
+        val nums = reader.readLine()
+            .split(" ")
+            .map { it.toInt() }
+            .toIntArray()
+        val operations = reader.readLine()
+            .split(" ")
+            .map { it.toInt() }
+            .toIntArray()
+
+        val (min, max) = calculator(nums, operations, nums[0], 0)
+        writer.write("$max\n$min")
+        writer.flush()
+    }
+
+    private fun calculator(nums: IntArray, operations: IntArray, result: Int, idx: Int): Pair<Int, Int> {
+        if (idx == nums.lastIndex)
+            return result to result
+
+        var min = Int.MAX_VALUE
+        var max = Int.MIN_VALUE
+        for (op in 0..3) {
+            if (operations[op] == 0) continue
+
+            val ans = calc(result, nums[idx + 1], op)
+            operations[op] -= 1
+            val (a, b) = calculator(nums, operations, ans, idx + 1)
+            operations[op] += 1
+
+            if (a < min) min = a
+            if (b > max) max = b
+        }
+
+        return min to max
+    }
+
+    private fun calc(a: Int, b: Int, op: Int) = when (op) {
+        0 -> a + b
+        1 -> a - b
+        2 -> a * b
+        else -> {
+            if (a < 0)
+                ((a * -1) / b) * -1
+            else a / b
+        }
+    }
 }
