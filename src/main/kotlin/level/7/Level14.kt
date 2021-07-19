@@ -1,5 +1,6 @@
 package level.`7`
 
+import kotlin.math.abs
 import kotlin.system.exitProcess
 
 
@@ -288,5 +289,53 @@ class Level14 {
                 ((a * -1) / b) * -1
             else a / b
         }
+    }
+
+    /**
+     * 플레이어가 넷인 경우, [0, 1], [2, 3]으로 나뉘는 케이스와 [2, 3], [0, 1]로 나뉘는 케이스의 중복이 발생함
+     */
+    fun `백준 14889`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val N = reader.readLine().toInt()
+        val info = mutableListOf<IntArray>()
+
+        repeat(N) {
+            val data = reader.readLine().split(" ").map { it.toInt() }.toIntArray()
+            info.add(data)
+        }
+
+        val team = BooleanArray(N)
+        val diff = findOptimalTeam(info, team, 0, 0)
+        writer.write("$diff")
+        writer.flush()
+    }
+
+    fun findOptimalTeam(info: MutableList<IntArray>, teamA: BooleanArray, idx: Int, cnt: Int): Int {
+        if (cnt == info.size / 2) {
+            return calcDifferceScore(info, teamA)
+        }
+
+        var minDiff = Int.MAX_VALUE
+        for (i in idx..info.lastIndex) {
+            teamA[i] = true
+            val diff = findOptimalTeam(info, teamA, i + 1, cnt + 1)
+            if (diff < minDiff) minDiff = diff
+            teamA[i] = false
+        }
+
+        return minDiff
+    }
+
+    fun calcDifferceScore(info: MutableList<IntArray>, team: BooleanArray): Int {
+        var aScore = 0
+        var bScore = 0
+        for (i in team.indices) {
+            for (j in i + 1..team.lastIndex) {
+                if (team[i] && team[j]) aScore += info[i][j] + info[j][i]
+                if (!team[i] && !team[j]) bScore += info[i][j] + info[j][i]
+            }
+        }
+        return abs(aScore - bScore)
     }
 }
