@@ -1,5 +1,8 @@
 package level.`7`
 
+import java.lang.Integer.max
+import java.lang.Integer.min
+
 fun main() {
 
 }
@@ -119,4 +122,59 @@ class Level15 {
         }
         return mem[n]
     }
+
+    fun `백준 1149`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val N = reader.readLine().toInt()
+        val cost = mutableListOf<IntArray>()
+        repeat(N) {
+            cost.add(reader.readLine().split(" ").map { it.toInt() }.toIntArray())
+        }
+
+        val minCost = coloring(cost, N - 1, 1)
+        writer.write(minCost)
+        writer.flush()
+    }
+
+    fun coloring(cost: MutableList<IntArray>, n: Int, i: Int): Int {
+        cost[i][0] += min(cost[i - 1][1], cost[i - 1][2])
+        cost[i][1] += min(cost[i - 1][0], cost[i - 1][2])
+        cost[i][2] += min(cost[i - 1][0], cost[i - 1][1])
+        return if (i == n) {
+            min(cost[i][0], min(cost[i][1], cost[i][2]))
+        } else {
+            coloring(cost, n, i + 1)
+        }
+    }
+
+    fun `백준 1932`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val N = reader.readLine().toInt()
+        val cost = mutableListOf<IntArray>()
+        repeat(N) {
+            cost.add(reader.readLine().split(" ").map { it.toInt() }.toIntArray())
+        }
+
+        val maxVal = findPath(cost, N - 2)
+        writer.write("$maxVal")
+        writer.flush()
+    }
+
+    fun findPath(cost: MutableList<IntArray>, i: Int): Int {
+        for (j in cost[i].indices) {
+            cost[i][j] += max(cost[i + 1][j], cost[i + 1][j + 1])
+        }
+        return if (i == 0) {
+            cost[i][0]
+        } else {
+            findPath(cost, i - 1)
+        }
+    }
+
+    fun `백준 2579`() {
+
+    }
+
 }
