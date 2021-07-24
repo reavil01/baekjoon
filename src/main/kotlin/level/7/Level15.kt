@@ -174,7 +174,57 @@ class Level15 {
     }
 
     fun `백준 2579`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val N = reader.readLine().toInt()
+        val cost = IntArray(N)
+        val score = IntArray(N)
+        repeat(N) {
+            cost[it] = reader.readLine().toInt()
+        }
 
+        maxScoreWhenSelectStairs(score, cost, 0)
+        writer.write("${score[N - 1]}")
+        writer.flush()
     }
 
+    fun maxScoreWhenSelectStairs(score: IntArray, cost: IntArray, i: Int) {
+        score[i] = when {
+            i > score.lastIndex -> return
+            i == 0 -> cost[i]
+            i == 1 -> score[i - 1] + cost[i]
+            i == 2 -> max(score[i - 2] + cost[i], cost[i - 1] + cost[i])
+            else -> max(score[i - 2] + cost[i], score[i - 3] + cost[i - 1] + cost[i])
+        }
+        maxScoreWhenSelectStairs(score, cost, i + 1)
+    }
+
+    fun `백준 1463`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val n = reader.readLine().toInt()
+
+        val cntArr = IntArray(n + 1)
+        operationToOne(cntArr, 1)
+
+        writer.write("${cntArr[n]}")
+        writer.flush()
+    }
+
+    fun operationToOne(cntArr: IntArray, n: Int) {
+        if (n > cntArr.lastIndex) return
+
+        cntArr[n] = when (n) {
+            1 -> 0
+            2, 3 -> 1
+            else -> {
+                val candidate = min(
+                    if (n % 2 == 0) cntArr[n / 2] + 1 else Int.MAX_VALUE,
+                    if (n % 3 == 0) cntArr[n / 3] + 1 else Int.MAX_VALUE
+                )
+                min(cntArr[n - 1] + 1, candidate)
+            }
+        }
+        operationToOne(cntArr, n + 1)
+    }
 }
