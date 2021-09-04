@@ -95,4 +95,30 @@ class Level16 {
         writer.write("$total")
         writer.flush()
     }
+
+    fun `백준 13305번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val n = reader.readLine().toInt()
+        val distances = reader.readLine().split(" ").map { it.toLong() }
+        val costs = reader.readLine().split(" ").map { it.toLong() }
+
+        var minTotalCost = 0L
+        var dist = 0L
+        var prevCost = costs[0]
+        for(i in distances.indices) {
+            val cost = costs[i]
+            if(cost < prevCost) {
+                minTotalCost += dist * prevCost
+                prevCost = cost
+                dist = distances[i]
+            } else {
+                dist += distances[i]
+            }
+        }
+        minTotalCost += dist * prevCost
+
+        writer.write("$minTotalCost")
+        writer.flush()
+    }
 }
