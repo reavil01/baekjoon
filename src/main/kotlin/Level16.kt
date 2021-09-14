@@ -1,5 +1,3 @@
-package level.`7`
-
 class Level16 {
     fun `백준 11047번`() {
         val reader = System.`in`.bufferedReader()

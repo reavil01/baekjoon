@@ -1,5 +1,3 @@
-package level.`7`
-
 import java.lang.StringBuilder
 
 class Level18 {

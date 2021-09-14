@@ -1,5 +1,3 @@
-package level.`7`
-
 class TimSort {
     fun sort(data: MutableList<Int>, min: Int) {
         var start = 0
@@ -21,6 +19,7 @@ class TimSort {
         }
     }
 
+
     private fun Pair<Int, Int>.size() = this.second - this.first
     private fun MutableList<Pair<Int, Int>>.pop() = run {
         val last = this.last()
@@ -31,7 +30,7 @@ class TimSort {
     private fun insertStack(data: MutableList<Int>, stack: MutableList<Pair<Int, Int>>, range: Pair<Int, Int>) {
 //    println("\nRANGE: $range")
 //    println("Insert Run: $range")
-//        println("[INS STACK] Current Stack: $stack, insert range: $range")
+        println("[INS STACK] Current Stack: $stack, insert range: $range")
 
         when (stack.size) {
             0 -> stack.add(range)

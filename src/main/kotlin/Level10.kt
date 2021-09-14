@@ -1,5 +1,3 @@
-package level.`7`
-
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
 import kotlin.math.pow

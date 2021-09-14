@@ -1,5 +1,3 @@
-package level.`7`
-
 import kotlin.math.min
 import kotlin.math.sqrt
 

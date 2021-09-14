@@ -1,8 +1,5 @@
-package level.`7`
-
 import kotlin.math.abs
 import kotlin.system.exitProcess
-
 
 fun main() {
 
