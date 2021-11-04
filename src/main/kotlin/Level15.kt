@@ -3,36 +3,7 @@ import java.lang.Integer.min
 import kotlin.collections.ArrayList
 
 fun main() {
-    val reader = System.`in`.bufferedReader()
-    val writer = System.out.bufferedWriter()
-    val (n, k) = reader.readLine().split(" ").map { it.toInt() }
-    val data = Array(n) { reader.readLine().split(" ").map { it.toInt() } }
-//
-//    var max = 0
-//    val dp = Array(n) { IntArray(k + 1) }
-//    for (i in 0 until n) {
-//        for (w in 0..k) {
-//            val item = data[i]
-////            if () {
-//                val value = max(
-//                    (if (i > 0 && w + item[0] <= k) dp[i - 1][w+item[0]] else 0) + item[1],
-//                    if (i > 0) dp[i - 1][w] else 0
-//                )
-//                dp[i][w] = value
-//                if (max < value) max = value
-//            } else {
-//                val value = max(
-//                    if (i > 0) dp[i - 1][w] else 0,
-//                    if(i>0 && w+item[0] <= k) dp[i-1][w+item[0]] + item[1] else 0
-//                )
-//                dp[i][w] = value
-//                if (max < value) max = value
-//            }
-//        }
-//    }
-//    println(dp.contentDeepToString())
-//    writer.write("$max")
-//    writer.flush()
+
 }
 
 class Level15 {
@@ -436,5 +407,31 @@ class Level15 {
 
         writer.write("$ans")
         writer.flush()
+    }
+
+    fun `백준 12865번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val (n, k) = reader.readLine().split(" ").map { it.toInt() }
+        val data = Array(n) { reader.readLine().split(" ").map { it.toInt() } }
+        val wList = data.map{it[0]}
+        val vList = data.map{it[1]}
+        val dp = Array(k+1) { IntArray(n+1) {0} }
+
+        for(i in 1..n) {
+            for(w in 1..k) {
+                if(w >= wList[i-1])
+                    dp[w][i] = max(dp[w-wList[i-1]][i-1] + vList[i-1], dp[w][i-1])
+                else
+                    dp[w][i] = dp[w][i-1]
+            }
+        }
+
+        val ans = dp.maxOf { it.maxOf { it } }
+        writer.write(ans.toString())
+        writer.flush()
+
+        writer.close()
+        reader.close()
     }
 }
