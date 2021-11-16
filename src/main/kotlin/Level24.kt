@@ -166,4 +166,68 @@ class Level24 {
 
         return complexSizeList
     }
+
+    fun `백준 1012번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val t = reader.readLine().toInt()
+
+        repeat(t) {
+            val (m, n, k) = reader.readLine().split(" ").map { it.toInt() }
+            val map = Array(m) { IntArray(n) }
+            repeat(k) {
+                val (x, y) = reader.readLine().split(" ").map { it.toInt() }
+                map[x][y] = 1
+            }
+            val ans = countWarms(map)
+            writer.write(ans.size.toString())
+            writer.newLine()
+        }
+        writer.flush()
+        writer.close()
+        reader.close()
+    }
+    fun countWarms(map: Array<IntArray>): MutableList<Int> {
+        val warmsCountList = mutableListOf<Int>()
+        val visit = Array(map.size) { BooleanArray(map[0].size) }
+
+        val queue: Queue<Pair<Int, Int>> = LinkedList()
+        val xDir = arrayOf(-1, 0, 1, 0)
+        val yDir = arrayOf(0, -1, 0, 1)
+
+        for (i in map.indices) {
+            for (j in map[0].indices) {
+                if (visit[i][j]) continue
+
+                if (map[i][j] == 1) {
+                    var size = 0
+                    queue.add(i to j)
+
+                    while (queue.isNotEmpty()) {
+                        val (x, y) = queue.poll()
+                        if (visit[x][y]) continue
+                        visit[x][y] = true
+                        if (map[x][y] == 1) {
+                            size++
+                            for (d in 0 until 4) {
+                                val newX = x + xDir[d]
+                                val newY = y + yDir[d]
+
+                                if (0 <= newX && newX < map.size && 0 <= newY && newY < map[0].size) {
+                                    if (visit[newX][newY]) continue
+                                    queue.add(newX to newY)
+                                }
+                            }
+                        }
+
+                    }
+                    if (size > 0) warmsCountList.add(size)
+                }
+
+                visit[i][j] = true
+            }
+        }
+
+        return warmsCountList
+    }
 }
