@@ -5,6 +5,7 @@ fun main() {
 
 }
 
+
 class Level24 {
     fun `백준 1260번`() {
         val reader = System.`in`.bufferedReader()
@@ -187,6 +188,7 @@ class Level24 {
         writer.close()
         reader.close()
     }
+
     fun countWarms(map: Array<IntArray>): MutableList<Int> {
         val warmsCountList = mutableListOf<Int>()
         val visit = Array(map.size) { BooleanArray(map[0].size) }
@@ -229,5 +231,144 @@ class Level24 {
         }
 
         return warmsCountList
+    }
+
+    fun `백준 2178번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val (n, m) = reader.readLine().split(" ").map { it.toInt() }
+
+        val map = Array(n) { reader.readLine().chunked(1).map { it.toInt() }.toList() }
+        val visit = Array(n) { BooleanArray(m) { false } }
+
+        // direction
+        val xPos = listOf(-1, 0, 1, 0)
+        val yPos = listOf(0, -1, 0, 1)
+
+        // set init job
+        val queue: Queue<Triple<Int, Int, Int>> = LinkedList()
+        queue.add(Triple(0, 0, 0))
+
+        var minCost = Int.MAX_VALUE
+        while (queue.isNotEmpty()) {
+            val (x, y, score) = queue.poll()
+            if (x == n - 1 && y == m - 1) {
+                if (minCost > score + 1) minCost = score + 1
+            }
+
+            for ((xMove, yMove) in xPos.zip(yPos)) {
+                val newX = x + xMove
+                val newY = y + yMove
+
+                if (newX < 0 || newY < 0) continue
+                if (newX == n || newY == m) continue
+
+                if (map[newX][newY] == 1 && !visit[newX][newY]) {
+                    visit[newX][newY] = true
+                    queue.add(Triple(newX, newY, score + 1))
+                }
+            }
+        }
+        writer.write("$minCost")
+        writer.flush()
+
+        reader.close()
+        writer.close()
+    }
+
+    fun `백준 7576번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val (m, n) = reader.readLine().split(" ").map { it.toInt() }
+
+        val map = Array(n) { reader.readLine().split(" ").map { it.toInt() }.toMutableList() }
+
+        // direction
+        val xPos = listOf(-1, 0, 1, 0)
+        val yPos = listOf(0, -1, 0, 1)
+
+        // init queue
+        val queue: Queue<Triple<Int, Int, Int>> = LinkedList()
+        map.forEachIndexed { x, list -> list.forEachIndexed { y, i -> if (i == 1) queue.add(Triple(x, y, 0)) } }
+
+        var lastStep = 0
+        while (queue.isNotEmpty()) {
+            val (x, y, step) = queue.poll()
+            if (step > lastStep) lastStep = step
+
+            for ((xMove, yMove) in xPos.zip(yPos)) {
+                val newX = x + xMove
+                val newY = y + yMove
+
+                if (newX < 0 || newY < 0) continue
+                if (newX == n || newY == m) continue
+
+                if (map[newX][newY] == 0) {
+                    map[newX][newY] = 1
+                    queue.add(Triple(newX, newY, step + 1))
+                }
+            }
+        }
+
+        // propagation check
+        if (map.any { it.contains(0) })
+            lastStep = -1
+
+        writer.write("$lastStep")
+        writer.flush()
+
+        reader.close()
+        writer.close()
+    }
+
+    fun `백준 7569번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val (m, n, h) = reader.readLine().split(" ").map { it.toInt() }
+
+        val map = Array(h) { Array(n) { reader.readLine().split(" ").map { it.toInt() }.toMutableList() } }
+
+        // direction
+        val xPos = listOf(-1, 0, 1, 0, 0, 0)
+        val yPos = listOf(0, -1, 0, 1, 0, 0)
+        val zPos = listOf(0, 0, 0, 0, 1, -1)
+
+        // init queue
+        val queue: Queue<List<Int>> = LinkedList()
+        map.forEachIndexed { z, list ->
+            list.forEachIndexed { x, list2 ->
+                list2.forEachIndexed { y, i -> if (i == 1) queue.add(listOf(x, y, z, 0)) }
+            }
+        }
+
+        var lastStep = 0
+        while (queue.isNotEmpty()) {
+            val (x, y, z, step) = queue.poll()
+            if (step > lastStep) lastStep = step
+
+            for (i in xPos.indices) {
+                val newX = x + xPos[i]
+                val newY = y + yPos[i]
+                val newZ = z + zPos[i]
+
+                if (newX < 0 || newY < 0 || newZ < 0) continue
+                if (newX == n || newY == m || newZ == h) continue
+
+                if (map[newZ][newX][newY] == 0) {
+                    map[newZ][newX][newY] = 1
+                    queue.add(listOf(newX, newY, newZ, step + 1))
+                }
+            }
+        }
+
+        // propagation check
+        if (map.any { it.any { l -> l.contains(0) } })
+            lastStep = -1
+
+        writer.write("$lastStep")
+        writer.flush()
+
+        reader.close()
+        writer.close()
     }
 }
