@@ -1,3 +1,4 @@
+import java.lang.Integer.min
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -366,6 +367,199 @@ class Level24 {
             lastStep = -1
 
         writer.write("$lastStep")
+        writer.flush()
+
+        reader.close()
+        writer.close()
+    }
+    fun `백준 1697번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val (n, k) = reader.readLine().split(" ").map { it.toInt() }
+
+        val visit = BooleanArray(k*2)
+
+        // direction
+        val direction: List<(Int) -> Int> = listOf({ x -> x - 1 }, { x -> x + 1 }, { x -> x * 2 })
+
+        // init job
+        val queue: Queue<Pair<Int, Int>> = LinkedList()
+        queue.add(n to 0)
+
+        var minCost = Int.MAX_VALUE
+        while (queue.isNotEmpty()) {
+            val (x, cost) = queue.poll()
+            when {
+                x == k -> minCost = min(minCost, cost)
+                x > k -> minCost = min(minCost, (x - k + cost))
+                else -> direction.forEach {
+                    val newX = it(x)
+                    if (newX > 0 && minCost >= cost + 1 && !visit[newX]) {
+                        visit[newX] = true
+                        queue.add(newX to cost + 1)
+                    }
+                }
+            }
+        }
+
+        writer.write("$minCost")
+        writer.flush()
+
+        reader.close()
+        writer.close()
+    }
+
+    fun `백준 2206번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val (n, m) = reader.readLine().split(" ").map { it.toInt() }
+
+        val map = Array(n) { reader.readLine().chunked(1).map { it.toInt() }.toList() }
+        val visit = Array(2) { Array(n) { BooleanArray(m) } }
+
+        // direction
+        val direction = listOf<(Int, Int) -> Pair<Int, Int>>(
+            { x, y -> x - 1 to y },
+            { x, y -> x + 1 to y },
+            { x, y -> x to y - 1 },
+            { x, y -> x to y + 1 }
+        ).asSequence()
+
+        // init job
+        val queue: Queue<List<Int>> = LinkedList()
+        queue.add(listOf(0, 0, 1, 1))
+
+        var minCost = Int.MAX_VALUE
+        while (queue.isNotEmpty()) {
+            val (x, y, cost, breakable) = queue.poll()
+
+            if (x == n - 1 && y == m - 1) minCost = min(minCost, cost)
+            else
+                direction
+                    .map { it(x, y) }
+                    .filter { (nX, nY) -> !(nX < 0 || nY < 0 || nX == n || nY == m) }
+                    .filter { (nX, nY) -> !visit[breakable][nX][nY] }
+                    .forEach { (nX, nY) ->
+                        if (map[nX][nY] == 1) {
+                            if (breakable == 1) {
+                                visit[0][nX][nY] = true
+                                queue.add(listOf(nX, nY, cost + 1, 0))
+                            }
+                        } else {
+                            visit[breakable][nX][nY] = true
+                            queue.add(listOf(nX, nY, cost + 1, breakable))
+                        }
+                    }
+        }
+
+        // checking to find route
+        if (minCost == Int.MAX_VALUE)
+            minCost = -1
+
+        writer.write("$minCost")
+        writer.flush()
+
+        reader.close()
+        writer.close()
+    }
+
+    fun `백준 7562번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val t = reader.readLine().toInt()
+
+        // direction
+        val direction = listOf<(Int, Int) -> Pair<Int, Int>>(
+            { x, y -> x - 2 to y + 1 },
+            { x, y -> x - 1 to y + 2 },
+            { x, y -> x + 1 to y + 2 },
+            { x, y -> x + 2 to y + 1 },
+            { x, y -> x + 2 to y - 1 },
+            { x, y -> x + 1 to y - 2 },
+            { x, y -> x - 1 to y - 2 },
+            { x, y -> x - 2 to y - 1 },
+        ).asSequence()
+
+        repeat(t) {
+            val l = reader.readLine().toInt()
+            val (sx, sy) = reader.readLine().split(" ").map { it.toInt() }
+            val (dx, dy) = reader.readLine().split(" ").map { it.toInt() }
+            val visit = Array(l) { BooleanArray(l) }
+
+            val queue: Queue<List<Int>> = LinkedList()
+            queue.add(listOf(sx, sy, 0))
+
+            var minCost = Int.MAX_VALUE
+            while (queue.isNotEmpty()) {
+                val (x, y, cost) = queue.poll()
+                if (x == dx && y == dy) minCost = min(minCost, cost)
+                else {
+                    direction
+                        .map { it(x, y) }
+                        .filter { (nx, ny) ->
+                            !(nx < 0 || ny < 0 || nx >= l || ny >= l)
+                        }.filter { (nx, ny) -> !visit[nx][ny] }
+                        .forEach { (nx, ny) ->
+                            visit[nx][ny] = true
+                            queue.add(listOf(nx, ny, cost + 1))
+                        }
+                }
+            }
+
+            writer.write("$minCost\n")
+        }
+
+        writer.flush()
+
+        reader.close()
+        writer.close()
+    }
+
+    fun `백준 1707번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val k = reader.readLine().toInt()
+
+        repeat(k) {
+            val (V, E) = reader.readLine().split(" ").map { it.toInt() }
+            val visit = IntArray(V) { -1 }
+            val edges = Array(V) { mutableListOf<Int>() }
+
+            repeat(E) {
+                val (u, v) = reader.readLine().split(" ").map { it.toInt() - 1 }.sortedBy { it }
+                edges[u].add(v)
+                edges[v].add(u)
+            }
+
+            fun bfs(start: Int): Boolean {
+                val queue: Queue<Pair<Int, List<Int>>> = LinkedList()
+                queue.add(start to edges[start])
+
+                var result = true
+                while (queue.isNotEmpty()) {
+                    val (u, vList) = queue.poll()
+                    for (v in vList) {
+                        if (visit[v] == -1) {
+                            queue.add(v to edges[v])
+                            if (visit[u] == 0) visit[v] = 1
+                            else visit[v] = 0
+                        } else if (visit[u] == visit[v]) {
+                            result = false
+                            break
+                        }
+                    }
+                }
+                return result
+            }
+
+            var result = true
+            for (start in 0 until V) {
+                if (!bfs(start)) result = false
+            }
+
+            writer.write("${if (result) "YES" else "NO"}\n")
+        }
+
         writer.flush()
 
         reader.close()
