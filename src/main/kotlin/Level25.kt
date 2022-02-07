@@ -166,4 +166,52 @@ class Level25 {
         reader.close()
         writer.close()
     }
+
+    fun `백준 11657번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val (N, M) = reader.readLine().split(" ").map { it.toInt() }
+
+        val minDist = LongArray(N) { Long.MAX_VALUE }
+
+        val weights = Array(N) { mutableListOf<Pair<Int, Int>>() }
+        repeat(M) {
+            val (u, v, w) = reader.readLine().split(" ").map { it.toInt() - 1 }
+            weights[u].add(v to w + 1)
+        }
+
+        fun bellman(start: Int): Boolean {
+            minDist[start] = 0
+
+            repeat(N) { round ->
+                weights.forEachIndexed { src, it ->
+                    it.forEach { (dst, cost) ->
+                        if (minDist[src] != Long.MAX_VALUE && cost + minDist[src] < minDist[dst]) {
+                            minDist[dst] = cost + minDist[src]
+                            if (round == N - 1) return true
+                        }
+                    }
+                }
+            }
+
+            return false
+        }
+
+        val fail = bellman(0)
+
+        if (fail) {
+            writer.write("-1")
+        } else {
+            minDist.forEachIndexed { idx, it ->
+                if (idx != 0) {
+                    val ans = if (it == Long.MAX_VALUE) -1 else it
+                    writer.write("$ans\n")
+                }
+            }
+        }
+        writer.flush()
+
+        reader.close()
+        writer.close()
+    }
 }
