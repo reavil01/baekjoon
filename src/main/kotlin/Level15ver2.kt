@@ -1,3 +1,4 @@
+import java.util.*
 import kotlin.math.min
 import kotlin.math.max
 
@@ -178,6 +179,189 @@ class Level15ver2 {
         }
 
         val ans = dp[n - 1].maxOf { it }
+        writer.write("$ans\n")
+        writer.flush()
+
+        reader.close()
+        writer.close()
+    }
+
+    fun `백준 2579번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val n = reader.readLine().toInt()
+        val cost = IntArray(n) { reader.readLine().toInt() }
+        val dp = IntArray(n)
+
+        for (i in 0 until n) {
+            dp[i] =
+                when (i) {
+                    0 -> cost[0]
+                    1 -> dp[0] + cost[1]
+                    2 -> max(cost[0], cost[1]) + cost[2]
+                    else -> max(dp[i - 2], dp[i - 3] + cost[i - 1]) + cost[i]
+                }
+        }
+        writer.write("${dp[n - 1]}\n")
+        writer.flush()
+
+        reader.close()
+        writer.close()
+    }
+
+    fun `백준 1463번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val n = reader.readLine().toInt()
+        val dp = IntArray(n + 1)
+
+        tailrec fun to1(n: Int): Int {
+            if (n == 1) return 0
+            if (dp[n] != 0) return dp[n]
+
+            dp[n] = listOf(
+                if (n % 3 == 0) to1(n / 3) else Int.MAX_VALUE,
+                if (n % 2 == 0) to1(n / 2) else Int.MAX_VALUE,
+                to1(n - 1)
+            ).minOf { it } + 1
+
+            return dp[n]
+        }
+
+        val ans = to1(n)
+        writer.write("$ans\n")
+        writer.flush()
+
+        reader.close()
+        writer.close()
+    }
+
+    fun `백준 10844번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val n = reader.readLine().toInt()
+        val dp = Array(n + 1) { IntArray(10) }
+
+        fun a(n: Int) {
+            if (n == 1) {
+                for (i in 1..9) {
+                    dp[n][i] = 1
+                }
+                return
+            }
+
+            if (dp[n].all { it == 0 }) a(n - 1)
+
+            for (i in 0..9) {
+                dp[n][i] = when (i) {
+                    0 -> dp[n - 1][i + 1] % 1000000000
+                    9 -> dp[n - 1][i - 1] % 1000000000
+                    else -> (dp[n - 1][i - 1] + dp[n - 1][i + 1]) % 1000000000
+                }
+            }
+        }
+
+        a(n)
+
+        val ans = dp[n].fold(0) { acc, it -> (acc + it) % 1000000000 }
+        writer.write("$ans\n")
+        writer.flush()
+
+        reader.close()
+        writer.close()
+    }
+
+    fun `백준 2156번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val n = reader.readLine().toInt()
+        val cost = IntArray(n) { reader.readLine().toInt() }
+        val dp = IntArray(n)
+
+        tailrec fun dp(s: Int) {
+            if (s == n) return
+
+            val a = dp.getOrElse(s - 3) { 0 } + cost.getOrElse(s - 1) { 0 } + cost[s]
+            val b = dp.getOrElse(s - 1) { 0 }
+            val c = dp.getOrElse(s - 2) { 0 } + cost[s]
+            dp[s] = max(a, max(b, c))
+
+            dp(s + 1)
+        }
+
+        dp(0)
+        val ans = dp[n - 1]
+        writer.write("$ans\n")
+        writer.flush()
+
+        reader.close()
+        writer.close()
+    }
+
+    fun `백준 11053번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val n = reader.readLine().toInt()
+        val cost = reader.readLine().split(" ").map { it.toInt() }
+
+        val queue = LinkedList<Int>()
+
+        fun lis() {
+            for (c in cost) {
+                if (queue.isEmpty()) queue.add(c)
+                if (queue.last() < c) queue.add(c)
+                if (queue.last() > c) {
+                    val idx = queue.withIndex()
+                        .findLast { it.value < c }?.index ?: -1
+                    queue[idx + 1] = c
+                }
+            }
+        }
+
+        lis()
+        writer.write("${queue.size}")
+        writer.flush()
+
+        reader.close()
+        writer.close()
+    }
+
+    fun `백준 11054번`() {
+        val reader = System.`in`.bufferedReader()
+        val writer = System.out.bufferedWriter()
+        val n = reader.readLine().toInt()
+        val cost = reader.readLine().split(" ").map { it.toInt() }
+
+        fun lis(i: Int, cost: List<Int>, dp: IntArray, queue: LinkedList<Int>) {
+            if (i == n) return
+
+            val c = cost[i]
+            when {
+                queue.isEmpty() -> queue.add(c)
+                queue.last() < c -> {
+                    queue.add(c)
+                }
+                queue.last() > c -> {
+                    val idx = queue.withIndex().findLast { it.value < c }?.index ?: -1
+                    queue[idx + 1] = c
+                }
+            }
+
+            dp[i] = queue.size
+            lis(i + 1, cost, dp, queue)
+        }
+
+        val queue = LinkedList<Int>()
+        val dp = IntArray(n)
+        lis(0, cost, dp, queue)
+
+        val queue2 = LinkedList<Int>()
+        val dp2 = IntArray(n)
+        val cost2 = cost.reversed()
+        lis(0, cost2, dp2, queue2)
+        dp2.reverse()
+
+        val ans = dp.zip(dp2).map { (a, b) -> a + b - 1 }.maxOf { it }
         writer.write("$ans\n")
         writer.flush()
 
